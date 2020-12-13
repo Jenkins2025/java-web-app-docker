@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: javawebappdeployment
 spec:
-  replicas: 4
+  replicas: 2
   selector:
     matchLabels:
       app: javawebapp
@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: javawebappcontainer
-        image: agunu2025/java-web-app
+        image: agunu2025/java-web-app:latest 
         ports:
         - containerPort: 8080              
 ---
