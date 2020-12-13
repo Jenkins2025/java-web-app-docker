@@ -12,8 +12,10 @@ node {
     sh "${mvnHome}/bin/mvn clean install "
     }
 
-   def getDockerTag(){
-    def tag  = sh script: 'git rev-parse HEAD', returnStdout: true
-    return tag
+    stage('Build Docker Image'){
+        sh "docker build . -t agunu2025/java-web-app:${DOCKER_TAG}"
+    }
+  
+     
 }
 
