@@ -16,6 +16,28 @@ node {
         sh "docker build . -t agunu2025/java-web-app:${buildNumber}"
     }
   
+  stage('Push Docker Image'){
+         withCredentials([string(credentialsId: 'dockerAuthenticationpublic', variable: 'dockerAuthenticationpublic')])  {
+          sh "docker login -u agunu2025 -p ${dockerAuthenticationpublic}"
+        }
+        sh "docker push agunu2025/java-web-app:${buildNumber} "
+     }
+
      
+    stage('Remove Docker Image'){
+        sh "docker rmi -f agunu2025/java-web-app:${buildNumber} "
+       }
+    
+     stage('Build Docker Image'){
+        sh "docker rm -f agunu2025/java-web-app:${buildNumber} "
+       }
+
+    stage("Deploy Application In KubernetesCluster"){
+        sshagent(['MacProAwsKeyPair']) {
+		    sh 'scp -o StrictHostKeyChecking=no javawebapp-deployment.yml ec2-user@3.17.81.207:'
+          sh 'ssh -o StrictHostKeyChecking=no ec2-user@3.17.81.207 kubectl apply -f .'
+        }
+    }
 }
+     
 
