@@ -35,7 +35,7 @@ node {
     stage("Deploy Application In KubernetesCluster"){
         sshagent(['MacProAwsKeyPair']) {
 		    sh 'scp -o StrictHostKeyChecking=no javawebapp-deployment.yml ec2-user@3.17.81.207:'
-          sh 'ssh -o StrictHostKeyChecking=no ec2-user@3.17.81.207 kubectl apply -f .'
+          sh 'ssh -o StrictHostKeyChecking=no ec2-user@3.17.81.207 kubectl apply -f javawebapp-deployment.yml'
         }
     }
 }
