@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: javawebappcontainer
-        image: agunu2025/java-web-app:8
+        image: agunu2025/java-web-app:12
         ports:
         - containerPort: 8080              
 ---
