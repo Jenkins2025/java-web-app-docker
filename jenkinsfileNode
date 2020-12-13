@@ -1,0 +1,50 @@
+node {
+     
+     DOCKER_TAG = getDockerTag()
+     def mvnHome = tool 'myMaven4'
+    
+    stage ("checkout")  {
+    git credentialsId: 'git-authentication-jenkins-login', url: 'https://github.com/Jenkins2025/java-web-app-docker.git'
+    }
+
+  
+  stage ('build')  {
+    sh "${mvnHome}/bin/mvn clean install "
+    }
+
+    stage('Build Docker Image'){
+        sh "docker build . -t agunu2025/java-web-app:${DOCKER_TAG}"
+    }
+  
+     stage('Push Docker Image'){
+         withCredentials([string(credentialsId: 'dockerAuthenticationpublic', variable: 'dockerAuthenticationpublic')])  {
+          sh "docker login -u agunu2025 -p ${dockerAuthenticationpublic}"
+        }
+        sh "docker push agunu2025/java-web-app:${DOCKER_TAG} "
+     }
+
+     
+    stage('Remove Docker Image'){
+        sh "docker rmi -f agunu2025/java-web-app:${DOCKER_TAG} "
+       }
+    
+     stage('Build Docker Image'){
+        sh "docker rm -f agunu2025/java-web-app:${DOCKER_TAG} "
+       }
+
+
+    stage("Deploy Application In KubernetesCluster"){
+        sh "chmod +x changeTag.sh"
+        sh "./changeTag.sh ${DOCKER_TAG}"
+        sshagent(['MacProAwsKeyPair']) {
+		    sh 'scp -o StrictHostKeyChecking=no javawebapp-deployment.yml ec2-user@172.31.0.36:'
+		    //sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.47.232 docker stack rm springboot'
+          sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.0.36 kubectl apply -f .'
+        }
+    }
+}
+   def getDockerTag(){
+    def tag  = sh script: 'git rev-parse HEAD', returnStdout: true
+    return tag
+}
+
