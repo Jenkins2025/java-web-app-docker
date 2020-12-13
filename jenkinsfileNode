@@ -4,7 +4,7 @@ node {
      def mvnHome = tool 'myMaven4'
     
     stage ("checkout")  {
-    git credentialsId: 'git-authentication-jenkins-login', url: 'https://github.com/Jenkins2025/java-web-app-docker.git'
+    git url: 'https://github.com/Jenkins2025/java-web-app-docker.git',branch: 'master' 
     }
 
   
